@@ -13,36 +13,51 @@ public class Axis extends Player{
      * Create a new Axis player.
      * It can initialized just once.
      */
-    private Axis(){
-        super(2);
+    private Axis(String name){
+        super(name,2);
+        Location location = new Location(9,12);
+        setPlayerSpecialLocation(location);
     }
 
-    public static Axis getInstance(){
-        if (AXIS == null) AXIS = new Axis();
+    /**
+     * We can only have one instance from this class.
+     * @return  instance
+     */
+    public static Axis getInstance(String name){
+        if (AXIS == null) AXIS = new Axis(name);
         return AXIS;
     }
 
     /**
-     * This method shows the player's cards.
+     * Axis player has a set of forces.
+     * Add these forces for the player.
      */
-    public void showCard(){
-        for (int i = 0; i < 7; i++){
-            setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
-            if ( i == 3){
-                System.out.print(makeTextsOnTheCards().get(0));
-                System.out.print(Color.RESET);
-                System.out.print("                              ");
-                setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
-                System.out.print(makeTextsOnTheCards().get(1));
-            }
-            else {
-                System.out.print("                              ");
-                System.out.print(Color.RESET);
-                System.out.print("                              ");
-                setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
-                System.out.print("                              ");
-            }
-            System.out.println(Color.RESET);
+    protected void addPlayerInitialForces(){
+        int numberOfTanks = 6;
+        int numberOfInfantries = 7;
+        Location[] locationOfTanks = {new Location(1,1), new Location(1,6), new Location(1,9),
+                new Location(1,12), new Location(2,7), new Location(2,12)};
+        Location[] locationOfInfantries = {new Location(1,2), new Location(1,3), new Location(1,8),
+                new Location(1,11), new Location(1,13), new Location(2,6), new Location(2,10)};
+        // add tanks
+        for (int i = 0; i < numberOfTanks; i++){
+            Tank tank = new Tank(locationOfTanks[i]);
+            tank.setGroupSize(4);
+            getForces().add(tank);
+        }
+        // add infantries
+        for (int i = 0; i < numberOfInfantries; i++){
+            Infantry infantry = new Infantry(locationOfInfantries[i]);
+            getForces().add(infantry);
         }
     }
+
+    /**
+     * Return the type of player (Axis or Allied) as a string.
+     * @return a string for player type
+     */
+    protected String returnPlayerType(){
+        return "Ax";
+    }
+
 }

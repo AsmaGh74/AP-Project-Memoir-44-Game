@@ -11,6 +11,7 @@ public class Tank extends Force{
      */
     public Tank(Location location){
         super(location);
+//        setGroupSize();  // Axis and Allied has different group size for their tanks.
     }
 
     /**
@@ -20,5 +21,13 @@ public class Tank extends Force{
         super.getValidMoves().put(1,true);
         super.getValidMoves().put(2,true);
         super.getValidMoves().put(3,true);
+    }
+
+    /**
+     * Return T for tank.
+     * @return T
+     */
+    protected String returnForceType(){
+        return "T";
     }
 }

@@ -11,13 +11,12 @@ public class Card {
     // stores whether the groups should be from tha same type of force or not
     // if true then we can command different types of forces
     private boolean differentForceType;
-    // stores the number of cards that we have from this type
-    private int numberOfCards;
+//    // stores the number of cards that we have from this type
+//    private int numberOfCards;
 
-    public Card(int numberOfUnits, boolean differentForceType, int numberOfCards){
+    public Card(int numberOfUnits, boolean differentForceType){
         this.numberOfUnits = numberOfUnits;
         this.differentForceType = differentForceType;
-        this.numberOfCards = numberOfCards;
     }
 
     /*************************************** getter methods ************************************/

@@ -41,4 +41,14 @@ public class Location {
         }
         return false;
     }
+
+    /**
+     * Calculate Manhattan distance between two locations.
+     * @param location1  location number one
+     * @param location2  location number two
+     * @return  Manhattan distance between two locations
+     */
+    public int returnDistanceBetweenTwoLocations(Location location1, Location location2){
+        return Math.abs(location1.column - location2.column) + Math.abs(location1.row - location2.row);
+    }
 }

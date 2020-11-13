@@ -16,7 +16,7 @@ public abstract class Force {
     private int groupSize;
 
     /**
-     * Create a new for at specific location.
+     * Create a new force at specific location.
      * @param location  location in which the force will be located
      */
     public Force(Location location){
@@ -28,6 +28,7 @@ public abstract class Force {
     /*************************************** getter methods ************************************/
     protected Location getLocation(){return location;}
     protected HashMap<Integer, Boolean> getValidMoves(){return validMoves;}
+    protected int getGroupSize(){return groupSize;}
     /*******************************************************************************************/
 
     /*************************************** setter methods ************************************/
@@ -36,9 +37,21 @@ public abstract class Force {
     /*******************************************************************************************/
 
     /**
-     * This method implements move and attack rules for forces.
+     * This method implements movement for force.
      */
-    public void moveAndAttack(){}
+    public void move(int horizontal, int vertical){
+        location.setRow(location.getRow() + vertical);
+        location.setColumn(location.getColumn() + horizontal);
+    }
 
     abstract protected void setValidMovements();
+
+    /**
+     * Return force type.
+     * If it's a tank return T.
+     * If it's an Infantry return I.
+     * If it's an Artillery return A.
+     * @return  force type
+     */
+    abstract protected String returnForceType();
 }

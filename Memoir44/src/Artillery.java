@@ -11,6 +11,7 @@ public class Artillery extends Force{
      */
     public Artillery(Location location){
         super(location);
+        setGroupSize(2);
     }
 
     /**
@@ -19,5 +20,13 @@ public class Artillery extends Force{
     protected void setValidMovements(){
         super.getValidMoves().put(1,false);
         super.getValidMoves().put(0,true);
+    }
+
+    /**
+     * Return A for artillery.
+     * @return A
+     */
+    protected String returnForceType(){
+        return "A";
     }
 }

@@ -13,6 +13,7 @@ public class Infantry extends Force{
      */
     public Infantry(Location location){
         super(location);
+        setGroupSize(4);
     }
 
     /**
@@ -23,5 +24,13 @@ public class Infantry extends Force{
         super.getValidMoves().put(1,true);
         // infantry can move two units but can not attack
         super.getValidMoves().put(2,false);
+    }
+
+    /**
+     * Return I for infantry.
+     * @return I
+     */
+    protected String returnForceType(){
+        return "I";
     }
 }
