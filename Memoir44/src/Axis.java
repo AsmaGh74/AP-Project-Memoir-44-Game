@@ -43,11 +43,13 @@ public class Axis extends Player{
         for (int i = 0; i < numberOfTanks; i++){
             Tank tank = new Tank(locationOfTanks[i]);
             tank.setGroupSize(4);
+            locationOfTanks[i].setStatus(true);
             getForces().add(tank);
         }
         // add infantries
         for (int i = 0; i < numberOfInfantries; i++){
             Infantry infantry = new Infantry(locationOfInfantries[i]);
+            locationOfInfantries[i].setStatus(true);
             getForces().add(infantry);
         }
     }
@@ -60,4 +62,11 @@ public class Axis extends Player{
         return "Ax";
     }
 
+    /**
+     * Print player type and name.
+     */
+    protected void printName(){
+        System.out.print(" Axis player- name: ");
+        super.printName();
+    }
 }

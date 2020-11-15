@@ -63,6 +63,18 @@ enum HexagonalType{
 }
 
 /**
+ * MovementDirections class defines all available movements for an arbitrary hexagon.
+ */
+enum MovementDirections{
+    L, R, UL, UR, DL, DR;
+    public static boolean check(String move){
+        if (move.equals("L") || move.equals("R") || move.equals("UL") ||
+                move.equals("DL") || move.equals("UR") || move.equals("DR")) return true;
+        return false;
+    }
+}
+
+/**
  * EnumClasses class is useless.
  * This class is just a blank page for enum classes.
  * @author Asma

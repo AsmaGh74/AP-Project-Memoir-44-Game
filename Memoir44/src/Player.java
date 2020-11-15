@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -44,11 +45,14 @@ public abstract class Player {
     /*************************************** getter methods ************************************/
     protected ArrayList<Card> getCards(){return playerCards;}
     protected ArrayList<Force> getForces(){return forces;}
+    protected int getNumberOfCards(){return numberOfCards;}
+    protected int getScores(){return scores;}
     /*******************************************************************************************/
 
     /*************************************** setter methods ************************************/
     public void setNumberOfCards(int numberOfCards){ this.numberOfCards = numberOfCards; }
     protected void setPlayerSpecialLocation(Location location){ playerSpecialLocation = location;}
+    protected void setScores(int scores){this.scores = scores;}
     /*******************************************************************************************/
 
 
@@ -92,6 +96,15 @@ public abstract class Player {
     }
 
     /**
+     * Remove a card from cards list by it's index.
+     * @param index  index of the card
+     */
+    protected void removeCardFromListByIndex(int index){
+       playerCards.remove(index);
+       setPlayerCardsInEveryRound();
+    }
+
+    /**
      * Player has a set of forces.
      * Add these forces for the player.
      */
@@ -109,8 +122,16 @@ public abstract class Player {
     /**
      * After every round player has been used one of cards so the card should be replaced.
      */
-    protected void addNewCardToPlayerCardsAfterEveryRound(){
+    private
+    void addNewCardToPlayerCardsAfterEveryRound(){
         playerCards.add(gameCards.getOneCardForPlayer());
+    }
+
+    /**
+     * Check if the player has used a card, add a new card to player's cards.
+     */
+    private void setPlayerCardsInEveryRound(){
+        if (cardsListSize()) addNewCardToPlayerCardsAfterEveryRound();
     }
 
     /**
@@ -143,32 +164,55 @@ public abstract class Player {
      */
     abstract protected String returnPlayerType();
 
+    /**
+     * Return the number of units for the card which is located in the entered index.
+     * @param index  index of player cards list
+     * @return  number of units for the card which is located in the entered index
+     */
+    protected int returnCardNumberOfUnits(int index){
+        return playerCards.get(index).getNumberOfUnits();
+    }
+
+    /**
+     * Return the different force type for the card which is located in the entered index.
+     * @param index  index of player cards list
+     * @return  different force type for the card which is located in the entered index
+     */
+    protected boolean returnCardDifferentForceType(int index){
+        return playerCards.get(index).getDifferentForceType();
+    }
+
+    /**
+     * Check if the numbers of forces that has been selected by the player are valid or not.
+     * Numbers must be in the range of forces list.
+     * If the selected card by player is for ordering identical units and the player has been selected non-identical units return false.
+     * @param differentUnits  differentUnits for the selected card by the player
+     * @param numbersOfSelectedForces  numbers of forces that have been selected by the user
+     * @return  true if numbers of forces are valid
+     */
+    protected boolean checkForNumbersOfSelectedForces(boolean differentUnits, ArrayList<Integer> numbersOfSelectedForces){
+        for (Integer ele:numbersOfSelectedForces) {
+            if (ele <= 0 || ele > forces.size()) {
+                System.out.println(" Invalid force number!");
+                return false;
+            }
+            if (Collections.frequency(numbersOfSelectedForces, ele) > 1){
+                System.out.println(" Duplicated force numbers!");
+                return false;
+            }
+            if (!differentUnits){
+                String forceType = forces.get(numbersOfSelectedForces.get(0)-1).returnForceType();
+                if (!forces.get(ele-1).returnForceType().equals(forceType)){
+                    System.out.println(" Selected forces must be from the same type!");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
     /************************************ visualization part **************************************/
-
-    /**
-     * Set color for text and background.
-     * @param textColor  color of the text
-     * @param backgroundColor  color of the background
-     */
-    private void setTextAndBackgroundColor(Color textColor, Color backgroundColor){
-        System.out.print(textColor);
-        System.out.print(backgroundColor);
-    }
-
-
-    /**
-     * For every entered string fill it sides by space.
-     * @param text entered string
-     * @return a string with specific length
-     */
-    private String stringWithSpecificSize(String text){
-        int cardSize = 30;
-        int add = (cardSize - text.length())/2;
-        String space = "";
-        for ( int i = 0; i < add; space+= " ", i++);
-        if ((cardSize - text.length()) % 2 == 0) return space + text + space;
-        return space + " " + text + space;
-    }
 
     /**
      * Create an array list for texts that should printed on the cards.
@@ -176,9 +220,11 @@ public abstract class Player {
      */
     private ArrayList<String> makeTextsOnTheCards(){
         ArrayList<String> texts = new ArrayList<>();
+        int i = 1;
         for (Card ele:playerCards) {
-            if (ele.getDifferentForceType()) texts.add(stringWithSpecificSize( "order " + ele.getNumberOfUnits() + " units" ));
-            else texts.add(stringWithSpecificSize( "order " + ele.getNumberOfUnits() + " identical units" ));
+            if (ele.getDifferentForceType()) texts.add(Text.stringWithSpecificSize(30, i +"- order " + ele.getNumberOfUnits() + " unit(s)" ));
+            else texts.add(Text.stringWithSpecificSize(30, i +"- order " + ele.getNumberOfUnits() + " identical unit(s)" ));
+            i++;
         }
         return texts;
     }
@@ -186,28 +232,56 @@ public abstract class Player {
     /**
      * This method shows the player's cards.
      */
-    protected void showCard(){
+    protected void showCards(){
+//        setPlayerCardsInEveryRound();
         for (int j = 0; j < numberOfCards/2; j++){
             for (int i = 0; i < 7; i++){
-                setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
+                Text.setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
                 if ( i == 3){
                     System.out.print(makeTextsOnTheCards().get(2*j));
                     System.out.print(Color.RESET);
                     System.out.print("                              ");
-                    setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
+                    Text.setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
                     System.out.print(makeTextsOnTheCards().get(2*j+1));
                 }
                 else {
                     System.out.print("                              ");
                     System.out.print(Color.RESET);
                     System.out.print("                              ");
-                    setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
+                    Text.setTextAndBackgroundColor(Color.WHITE_BOLD, Color.BLACK_BACKGROUND);
                     System.out.print("                              ");
                 }
                 System.out.println(Color.RESET);
             }
             System.out.println();
         }
+    }
+
+    /**
+     * List player's forces.
+     * List type, group size, and location of the forces.
+     * @return number of forces (in group) that the player has.
+     */
+    protected int listLocationOfPlayerForces(){
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        int i = 1;
+        for (Force ele:forces) {
+            if (i < 10) System.out.print(" 0" + i + "- ");
+            else System.out.print(" " + i + "- ");
+            ele.printInfo();
+            System.out.print(" ");
+            ele.getLocation().printInfo();
+            System.out.println();
+            i ++;
+        }
+        return forces.size();
+    }
+
+    /**
+     * Print player type and name.
+     */
+    protected void printName(){
+        System.out.print(name);
     }
 
     /*******************************************************************************************/

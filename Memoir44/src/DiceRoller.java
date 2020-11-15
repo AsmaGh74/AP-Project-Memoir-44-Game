@@ -15,26 +15,34 @@ public class DiceRoller {
     public DiceRoller(){
     }
 
-    protected ArrayList<String> rollTheDice(int numberOfDiceRolling, HexagonalType hexagonalTypeForAttacker, HexagonalType hexagonalTypeForEnemy,
+    /**
+     * This methods implements dice rolling rules and finally returns the dice numbers.
+     * @param numberOfDiceRolling  initial number for dice rolling
+     * @param hexagonalTypeForAttacker  type of the hexagon which the attacker located there
+     * @param hexagonalTypeForTarget  type of the hexagon which the target located there
+     * @param attacker  type of attacker force
+     * @return  dice numbers after dice rolling
+     */
+    protected ArrayList<Integer> rollTheDice(int numberOfDiceRolling, String hexagonalTypeForAttacker, String hexagonalTypeForTarget,
                                          Force attacker){
         Random random = new Random();
-        ArrayList<String> diceNumbers = new ArrayList<>();
+        ArrayList<Integer> diceNumbers = new ArrayList<>();
         int initialNumberOfDiceRolling = numberOfDiceRolling;
-        switch (hexagonalTypeForEnemy){
-            case HILL:
+        switch (hexagonalTypeForTarget){
+            case "H":
                 if (attacker.returnForceType().equals("T") || attacker.returnForceType().equals("I")) initialNumberOfDiceRolling--;
                 break;
-            case FOREST:
-            case CITY:
+            case "F":
+            case "C":
                 if (attacker.returnForceType().equals("T")) initialNumberOfDiceRolling-=2;
                 if (attacker.returnForceType().equals("I")) initialNumberOfDiceRolling--;
                 break;
         }
-        if (hexagonalTypeForAttacker.name().equals("CITY")){
+        if (hexagonalTypeForAttacker.equals("C")){
             if (attacker.returnForceType().equals("T")) initialNumberOfDiceRolling-=2;
         }
         for (int i = 0; i < initialNumberOfDiceRolling; i++){
-            diceNumbers.add(Integer.toString(random.nextInt(6) + 1));
+            diceNumbers.add(random.nextInt(6) + 1);
         }
         return diceNumbers;
     }

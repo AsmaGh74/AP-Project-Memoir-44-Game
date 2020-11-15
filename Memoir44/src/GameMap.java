@@ -1,5 +1,7 @@
+import java.nio.file.LinkOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 /**
  * GameMap class implements and presents the map of the game and players.
@@ -10,9 +12,9 @@ public class GameMap {
     // this HashMap stores type of every hexagonal in the game map
     private static HashMap<Location, HexagonalType> hexagons;
     // stores Axis player on the map
-    private Axis axisPlayer;
+    private static Axis axisPlayer;
     // stores Allied player on the map
-    private Allied alliedPlayer;
+    private static Allied alliedPlayer;
     // stores dice roller for attack part of the game
     private DiceRoller diceRoller;
 
@@ -27,6 +29,7 @@ public class GameMap {
         axisPlayer = Axis.getInstance(axisPlayerName);
         // initialize the only Allied player
         alliedPlayer = Allied.getInstance(alliedPlayerName);
+        diceRoller = new DiceRoller();
     }
 
     /********************************************************** getter methods *****************************************/
@@ -98,16 +101,6 @@ public class GameMap {
     }
 
     /**
-     * Set color for text and background.
-     * @param textColor  color of the text
-     * @param backgroundColor  color of the background
-     */
-    private void setTextAndBackgroundColor(Color textColor, Color backgroundColor){
-        System.out.print(textColor);
-        System.out.print(backgroundColor);
-    }
-
-    /**
      * Return a string for every hexagon type.
      * This  string represents the hexagon type.
      * @param hexagonalType hexagon real type
@@ -137,10 +130,13 @@ public class GameMap {
      * Print guide for hexagons types.
      */
     private void guide(){
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        System.out.println();
         System.out.println(" Guide:");
         System.out.println(" G: Ground, H: Hill, C: City, R: River, B: Bridge, S:Shelter, F: Forest");
         System.out.println(" Axis forces: Red color, Allied forces: Green color");
         System.out.println(" T: Tank, I: Infantry, A: Artillery");
+        System.out.println();
     }
 
     /**
@@ -153,13 +149,13 @@ public class GameMap {
         for (Force ele:axisPlayer.getForces()) {
             if (ele.getLocation().equals(location)){
                 s = Integer.toString(ele.getGroupSize()) + ele.returnForceType();
-                setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
             }
         }
         for (Force ele:alliedPlayer.getForces()) {
             if (ele.getLocation().equals(location)){
                 s = Integer.toString(ele.getGroupSize()) + ele.returnForceType();
-                setTextAndBackgroundColor(Color.GREEN_BOLD, Color.BLACK_BACKGROUND);
+                Text.setTextAndBackgroundColor(Color.GREEN_BOLD, Color.BLACK_BACKGROUND);
             }
         }
         return s;
@@ -170,7 +166,7 @@ public class GameMap {
      * @param location  hexagon location
      * @return a string of type of hexagon
      */
-    private String hexagonTypeInTheLocation(Location location){
+    public static String hexagonTypeInTheLocation(Location location){
         String s ="";
         for (Location ele:hexagons.keySet()) {
             if (ele.equals(location)){
@@ -185,9 +181,8 @@ public class GameMap {
      * Draw map of the game.
      */
     public void drawMap(){
-        setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
         guide();
-        setTextAndBackgroundColor(Color.BLUE_BOLD, Color.BLACK_BACKGROUND);
+        Text.setTextAndBackgroundColor(Color.BLUE_BOLD, Color.BLACK_BACKGROUND);
         // define row and column number variables
         int row = 0;
         int column = 0;
@@ -226,7 +221,7 @@ public class GameMap {
                 // find the force that is in the location
                 s = forceInTheLocation(location);
                 System.out.printf("%s", s);
-                setTextAndBackgroundColor(Color.BLUE_BOLD,Color.BLACK_BACKGROUND);
+                Text.setTextAndBackgroundColor(Color.BLUE_BOLD,Color.BLACK_BACKGROUND);
             }
             System.out.println();
 
@@ -261,49 +256,270 @@ public class GameMap {
                     // find the force that is in the location
                     s = forceInTheLocation(location);
                     System.out.printf("%s", s);
-                    setTextAndBackgroundColor(Color.BLUE_BOLD,Color.BLACK_BACKGROUND);
+                    Text.setTextAndBackgroundColor(Color.BLUE_BOLD,Color.BLACK_BACKGROUND);
                 }
                 System.out.println();
             }
         }
         System.out.print(Color.RESET);
+        System.out.println();
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
     }
 
     /*******************************************************************************************************************/
     /**************************************************** playing part *************************************************/
 
     /**
-     * Roll the dice for the player.
-     * @param player  player whose turn it is
-     * @return  dice numbers as a array list of string // ArrayList<String> replace with void after completion
+     * Check if the entered location if full or empty.
+     * @param location location to be checked
+     * @return  true if the location is empty.
      */
-    public void rollTheDice(Player player){
-        int initialNumberOfDiceRolling = 8;  // check this put
-//        if (player.returnPlayerType().equals("Al")){
-//            if (hexagonalTypeForEnemy.name().equals("SHELTER")){
-//                if (attacker.returnForceType().equals("T")) initialNumberOfDiceRolling-=2;
-//                if (attacker.returnForceType().equals("I")) initialNumberOfDiceRolling--;
-//            }
-//        }
-//        return diceRoller.rollTheDice(initialNumberOfDiceRolling, ); // complete and destroy comments
+    public static boolean returnLocationStatusBasedOnForces(Location location){
+        for (Force ele: axisPlayer.getForces()) {
+            if (ele.getLocation().equals(location)) return false;
+        }
+        for (Force ele: alliedPlayer.getForces()) {
+            if (ele.getLocation().equals(location)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return the starting player based on a random number.
+     * @param startingPlayerNumber  number of the starting player
+     * @return  starting player
+     */
+    private Player returnStartingPlayer(int startingPlayerNumber){
+        if (startingPlayerNumber % 2 == 0) return alliedPlayer;
+        return axisPlayer;
+    }
+
+    protected void playTheGame(int startingPlayerNumber){
+        boolean[] beingInSpecialLocationInPreviousRound = {false,false};
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+        System.out.println();
+        System.out.print(" The game will start with: ");
+        int playerNumber = startingPlayerNumber;
+        returnStartingPlayer(playerNumber).printName();
+        int k = 0;
+        while (k == 0){ // change the condition to  returnStartingPlayer(playerNumber).getScores() == 6 || returnStartingPlayer(playerNumber + 1).getScores() == 6
+            showPlayerCards(returnStartingPlayer(playerNumber)); // after one round increase the startingPlayerNumber
+            Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+            // say the player to choose one card
+            Scanner scanner = new Scanner(System.in);
+            int cardNumber = 0;
+            do {
+                System.out.println(" Now pick a card and enter it's number (please enter a valid number):");
+                cardNumber = Integer.valueOf(scanner.nextLine());
+            } while (!(cardNumber > 0 && cardNumber <= returnStartingPlayer(playerNumber).getNumberOfCards()));
+            // list player's available forces
+            listPlayerForces(returnStartingPlayer(playerNumber));
+            // say the player that can select from forces list
+            int numberOfUnits = returnStartingPlayer(playerNumber).returnCardNumberOfUnits(cardNumber-1);
+            boolean differentUnits = returnStartingPlayer(playerNumber).returnCardDifferentForceType(cardNumber-1);
+            System.out.print(" Now you can select " + numberOfUnits + " ");
+            Text.setTextAndBackgroundColor(Color.RED_BOLD,Color.BLACK_BACKGROUND);
+            if (differentUnits) System.out.print(" different or identical");
+            else System.out.print(" identical");
+            Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+            System.out.println(" unit(s) from your available forces.\n Entered numbers must be different.\n " +
+                    "Your available forces are listed above and also showed in tha map.\n " +
+                    "If you enter the wrong number based on selected card, you must select again!");
+            // now remove selected card from player's cards
+            returnStartingPlayer(playerNumber).removeCardFromListByIndex(cardNumber-1);
+            // let the player to select forces
+            ArrayList<Integer> numberOfSelectedForces = new ArrayList<>();
+            do {
+                numberOfSelectedForces.removeAll(numberOfSelectedForces);
+                for (int i = 0; i < numberOfUnits; i++){
+                    System.out.println(" Enter a valid number for force number " + (i+1) + " :");
+                    numberOfSelectedForces.add(Integer.valueOf(scanner.nextLine()));
+                }
+            } while (!returnStartingPlayer(playerNumber).checkForNumbersOfSelectedForces(differentUnits, numberOfSelectedForces));
+            // ask player for selected forces movements
+            ArrayList<String> movements = new ArrayList<>();
+            Text.listMovementDirections();
+            for (Integer ele:numberOfSelectedForces) {
+//                movements.removeAll(movements);
+                do {
+                    movements.removeAll(movements);
+                    System.out.println(" Now select your move for force number " + ele);
+                    System.out.println(" Valid movements:");
+                    // print valid movements for the force
+                    returnStartingPlayer(playerNumber).getForces().get(ele-1).printValidMovements();
+                    System.out.println(" Enter your movement (example: 1R 2UL or just 0 to not move):");
+                    String[] moves = scanner.nextLine().split(" "); // add to array list
+                    for (String string:moves) {
+                        if (string != null) movements.add(string);
+                    } // here
+                }while (!returnStartingPlayer(playerNumber).getForces().get(ele-1).checkMovementsValidityForForce(movements));
+            }
+            // now we should check for spacial locations for player's forces and change the scores based on the result
+            if (returnStartingPlayer(playerNumber).checkForBeingInSpacialLocation()){
+                if (!beingInSpecialLocationInPreviousRound[playerNumber%2]) returnStartingPlayer(playerNumber).addToScores();
+            }
+            else {
+                if (beingInSpecialLocationInPreviousRound[playerNumber%2]) returnStartingPlayer(playerNumber).subtractFromScores();
+            }
+            // now that we have valid movements for all the forces, we should redraw the game map
+            drawMap();
+            // now we should start attack part
+            for (Integer ele:numberOfSelectedForces) {
+                Force attackerForce = returnStartingPlayer(playerNumber).getForces().get(ele-1);
+                // we should check force's attack ability status
+                if (attackerForce.getAttackAbility()){
+                    System.out.println(" Select target for force number " + ele);
+                    System.out.println(" Locations for rival forces:");
+                    // now list locations for rival forces
+                    listPlayerForces(returnStartingPlayer(playerNumber + 1));
+                    int numberOfTargetForceInTheList = 0;
+                    int initialNumberOfDiceRolling = 0;
+                    do {
+                        System.out.println(" Enter a valid number or just 0 to don't attack:");
+                        numberOfTargetForceInTheList = Integer.valueOf(scanner.nextLine());
+                        if (numberOfTargetForceInTheList == 0) break; // break the do-while loop
+                        initialNumberOfDiceRolling = attackerForce.checkForSelectedTargetValidity(returnStartingPlayer(playerNumber + 1).getForces().get(numberOfTargetForceInTheList-1).getLocation());
+                    } while (!(numberOfTargetForceInTheList >= 1 &&
+                            numberOfTargetForceInTheList <= returnStartingPlayer(playerNumber + 1).getForces().size() &&
+                            initialNumberOfDiceRolling != 0)); // check for target location validity
+                    // now player has selected the target location
+                    if (numberOfTargetForceInTheList == 0) continue; // go to next selected force to attack
+                    Force targetForce = returnStartingPlayer(playerNumber + 1).getForces().get(numberOfTargetForceInTheList-1);
+                    // if the attacker type is allied and axis force is in the shelter, allied tank should roll the dice twice less
+                    // and allied infantry should roll the dice once less
+                    if (returnStartingPlayer(playerNumber).returnPlayerType().equals("Al")){
+                        System.out.println("check for allied al"); // test
+                        if (attackerForce.returnForceType().equals("T")) initialNumberOfDiceRolling -= 2;
+                        if (attackerForce.returnForceType().equals("I")) initialNumberOfDiceRolling--;
+                    }
+                    // now roll the dice with this initial number for dice rolling
+                    System.out.println("before dice"); // test
+                    ArrayList<Integer> diceNumbers = new ArrayList<>();
+                    diceNumbers = diceRoller.rollTheDice(initialNumberOfDiceRolling,
+                            hexagonTypeInTheLocation(attackerForce.getLocation()),
+                            hexagonTypeInTheLocation(targetForce.getLocation()),
+                            attackerForce);
+                    // now we have the random selected dice numbers
+                    // now based on target force type and dice numbers we should determine attack ability
+                    System.out.println("after dice"); // test
+                    if (diceNumbers.contains(3) || diceNumbers.contains(4)){
+                        System.out.println(" You can not attack with this force! (dice error)");
+                        continue;
+                    }
+                    if (diceNumbers.contains(5)){
+                        targetForce.setGroupSize(targetForce.getGroupSize() - 1);
+                        if (targetForce.getGroupSize() == 0) {
+                            returnStartingPlayer(playerNumber).addToScores();
+                            // remove the force with 0 group size
+                            returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
+                        }
+                    }
+                    else {
+                        switch (targetForce.returnForceType()){
+                            case "I":
+                                if (diceNumbers.contains(1) || diceNumbers.contains(6)){ // attacker force can attack
+                                    targetForce.setGroupSize(targetForce.getGroupSize() - 1);
+                                    if (targetForce.getGroupSize() == 0) {
+                                        returnStartingPlayer(playerNumber).addToScores();
+                                        // remove the force with 0 group size
+                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
+                                    }
+                                }
+                                break;
+                            case "T":
+                                if (diceNumbers.contains(2)){ // attacker force can attack
+                                    targetForce.setGroupSize(targetForce.getGroupSize() - 1);
+                                    if (targetForce.getGroupSize() == 0) {
+                                        returnStartingPlayer(playerNumber).addToScores();
+                                        // remove the force with 0 group size
+                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                   attackerForce.setAttackAbility(false);
+                }
+            }
+            if (playerNumber%2 == 0) Text.showScores(returnStartingPlayer(playerNumber + 1).getScores(),
+                    returnStartingPlayer(playerNumber).getScores());
+            else Text.showScores(returnStartingPlayer(playerNumber).getScores(),
+                    returnStartingPlayer(playerNumber + 1).getScores());
+            drawMap();
+            // now change the player
+            playerNumber++;
+            k++;
+        }
     }
 
     /*******************************************************************************************************************/
     /************************************************ printing messages part *******************************************/
 
+    /**
+     * List player forces.
+     * List force type, group size, and location.
+     * @param player player whose forces must be listed
+     */
+    protected void listPlayerForces(Player player){
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        System.out.println();
+        player.printName();
+        System.out.println();
+        System.out.println(" forces list:");
+        System.out.println();
+        player.listLocationOfPlayerForces();
+        System.out.println();
+    }
+
+    /**
+     * Show player's cards
+     * @param player  player whose cards must be showed
+     */
+    private void showPlayerCards(Player player){
+//        System.out.println(Color.RESET);
+        System.out.println();
+//        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        player.printName();
+        System.out.println();
+        System.out.println(" cards list:");
+        System.out.println();
+        System.out.println(Color.RESET);
+        System.out.println();
+        player.showCards();
+        System.out.println();
+    }
+
+    /**
+     * For a specific location list it's valid directions.
+     * Directions that player can go through.
+     * @param location  location which it's valid directions must be listed
+     */
+    protected void listLocationValidDirections(Location location){
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+        System.out.println();
+        System.out.println(" Valid directions:");
+        Text.listAnArrayList(location.validDirectionsInLocation()); // u can also get array list size
+        System.out.println();
+    }
+
+//    public void test(){
+//        Location location = new Location(2,2);
+//        listLocationValidDirections(location);
+//        showPlayerCards(alliedPlayer);
+//    }
 
 
     /*******************************************************************************************************************/
-
-    /**
-     * For every location on the game map return it's hexagon type.
-     * @param location  location in which we want it's hexagon type
-     * @return  hexagon type of the location
-     */
-    public String getEveryLocationHexagonType(Location location){
-        for (Location ele: hexagons.keySet()) {
-            if (ele.equals(location)) return returnHexagonsType(hexagons.get(ele));
-        }
-        return "";
-    }
+//
+//    /**
+//     * For every location on the game map return it's hexagon type.
+//     * @param location  location in which we want it's hexagon type
+//     * @return  hexagon type of the location
+//     */
+//    public static String getEveryLocationHexagonType(Location location){
+//        for (Location ele: hexagons.keySet()) {
+//            if (ele.equals(location)) return returnHexagonsType(hexagons.get(ele));
+//        }
+//        return "";
+//    }
 }
