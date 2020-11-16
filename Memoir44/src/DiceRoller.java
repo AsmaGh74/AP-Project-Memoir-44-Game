@@ -41,6 +41,7 @@ public class DiceRoller {
         if (hexagonalTypeForAttacker.equals("C")){
             if (attacker.returnForceType().equals("T")) initialNumberOfDiceRolling-=2;
         }
+        if (initialNumberOfDiceRolling <= 0) System.out.println(" Dice rolling can not be done based on the game rules!");
         for (int i = 0; i < initialNumberOfDiceRolling; i++){
             diceNumbers.add(random.nextInt(6) + 1);
         }

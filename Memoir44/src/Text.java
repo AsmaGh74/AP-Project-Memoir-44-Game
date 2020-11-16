@@ -101,4 +101,16 @@ public class Text {
         System.out.println("   ***********************************************");
         System.out.println(Color.RESET);
     }
+
+    public static void printDiceNumbersHorizontally(ArrayList<Integer> diceNumbers){
+        if (diceNumbers.size() != 0){
+            System.out.println();
+            System.out.println(" Dice rolling result:");
+            for (Integer ele:diceNumbers) {
+                System.out.print(" " + ele + " ");
+            }
+            System.out.println();
+        }
+    }
+
 }

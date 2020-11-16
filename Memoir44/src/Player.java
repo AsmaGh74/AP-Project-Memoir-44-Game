@@ -193,11 +193,11 @@ public abstract class Player {
     protected boolean checkForNumbersOfSelectedForces(boolean differentUnits, ArrayList<Integer> numbersOfSelectedForces){
         for (Integer ele:numbersOfSelectedForces) {
             if (ele <= 0 || ele > forces.size()) {
-                System.out.println(" Invalid force number!");
+                System.out.println(" Invalid force location!");
                 return false;
             }
             if (Collections.frequency(numbersOfSelectedForces, ele) > 1){
-                System.out.println(" Duplicated force numbers!");
+                System.out.println(" Duplicated locations!");
                 return false;
             }
             if (!differentUnits){
@@ -209,6 +209,21 @@ public abstract class Player {
             }
         }
         return true;
+    }
+
+    /**
+     * Return the player's force number based of location of the force.
+     * @param row  row of the location of the force
+     * @param column  column of the location of the force
+     * @return  index + 1 for matched force with the location
+     */
+    protected int returnPlayerForceIndexBasedOnLocation(int row, int column){
+        Location location = new Location(row,column);
+        for (int i = 0; i < forces.size(); i++){
+            if (forces.get(i).getLocation().equals(location)) return i+1;
+        }
+        System.out.println(" Invalid target location!");
+        return -1;
     }
 
 

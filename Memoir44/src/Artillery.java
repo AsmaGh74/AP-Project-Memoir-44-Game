@@ -49,7 +49,7 @@ public class Artillery extends Force{
         System.out.println(" Force type: Artillery");
         for (Integer ele :getValidMoves().keySet()) {
             System.out.print(" " + ele + " move");
-            if (getValidMoves().get(ele) == true) System.out.println(" and then you can attack.");
+            if (getValidMoves().get(ele)) System.out.println(" and then you can attack.");
             else System.out.println(" and then you can't attack.");
         }
     }
@@ -112,6 +112,8 @@ public class Artillery extends Force{
                 getLocation().setColumn(locationAfterMovements.getColumn());
             }
         }
+        // if everything was ok and also force did not trip in the forest set force's attack ability as true
+        setAttackAbility(true);
         return true;
     }
 
@@ -126,15 +128,12 @@ public class Artillery extends Force{
         switch (distance){
             case 1:
             case 2:
-                System.out.println(" You can have 3 dice rollings.");
                 return 3;
             case 3:
             case 4:
-                System.out.println(" You can have 4 dice rollings.");
                 return 4;
             case 5:
             case 6:
-                System.out.println(" You can have 1 dice rollings.");
                 return 1;
         }
         System.out.println(" Distance from your infantry force to target is more than expected!");

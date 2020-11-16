@@ -127,12 +127,11 @@ public class Tank extends Force{
         int distance = 0;
         distance = getLocation().returnDistanceBetweenTwoLocations(targetForceLocation);
         if (distance > 3){
-            System.out.println(distance); // test
             System.out.println(" Distance from your tank force to target is more than expected!");
             return 0;
         }
         // tank force can have 3 dice rolling generally
-        System.out.println(" You can have 3 dice rollings.");
+//        System.out.println(" You can have 3 dice rollings.");  // delete, cause will be manipulate
         return 3;
     }
 }

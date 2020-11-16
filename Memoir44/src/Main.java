@@ -10,6 +10,7 @@ public class Main {
         Random random = new Random();
         return random.nextInt(2) + 1;
     }
+
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
@@ -23,6 +24,8 @@ public class Main {
         gameMap.drawMap();
         // start with a random player
         gameMap.playTheGame(getOneOrTwo());
+//        gameMap.playTheGame(1);
+
     }
 
 }

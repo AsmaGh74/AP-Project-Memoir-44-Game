@@ -57,15 +57,17 @@ public class Location {
      * @return  Manhattan distance between two locations
      */
     public int returnDistanceBetweenTwoLocations(Location location){
-        System.out.println(this.row); // test
-        System.out.println(this.column); // test
-        System.out.println(location.row); // test
-        System.out.println(this.column); // test
         if (this.row == location.row) return  Math.abs(this.column - location.column);
         if (this.column == location.column) return  Math.abs(this.row - location.row);
         Location newLocation = new Location(0,0);
-        if (this.row < location.row) newLocation = this;
-        else newLocation = location;
+        if (this.row < location.row){
+            newLocation.setRow(this.row);
+            newLocation.setColumn(this.column);
+        }
+        else{
+            newLocation.setRow(location.getRow());
+            newLocation.setColumn(location.getColumn());
+        }
         newLocation.setRow(newLocation.getRow() + ((Math.abs(this.row - location.row) / 2)*2));
         newLocation.setColumn(newLocation.getColumn() + ((Math.abs(this.row - location.row) / 2)*1));
         if (Math.abs(this.row - location.row) % 2 != 0) {
