@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Infantry class represents an individual infantry that can move and attack.
@@ -108,6 +107,8 @@ public class Infantry extends Force{
                     // now move and tripp in the forest
                     getLocation().setRow(locationAfterMovements.getRow());
                     getLocation().setColumn(locationAfterMovements.getColumn());
+                    // when the force tripped in the forest can not attack
+                    setAttackAbility(false);
                     return true;
                 }
                 getLocation().setRow(locationAfterMovements.getRow());
@@ -115,7 +116,7 @@ public class Infantry extends Force{
             }
         }
         // if everything was ok and also force did not trip in the forest set force's attack ability as true
-        setAttackAbility(true);
+        setAttackAbility(getValidMoves().get(numberOfMovements));
         return true;
     }
 
@@ -129,13 +130,10 @@ public class Infantry extends Force{
         distance = getLocation().returnDistanceBetweenTwoLocations(targetForceLocation);
         switch (distance){
             case 1:
-//                System.out.println(" You can have 3 dice rollings.");
                 return 3;
             case 2:
-//                System.out.println(" You can have 2 dice rollings.");
                 return 2;
             case 3:
-//                System.out.println(" You can have 1 dice rollings.");
                 return 1;
         }
         System.out.println(" Distance from your infantry force to target is more than expected!");

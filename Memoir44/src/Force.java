@@ -48,7 +48,6 @@ public abstract class Force {
      * @return new location after movements
      */
     public Location move(MovementDirections movementDirection, Location currentLocation){
-//        Location locationAfterMovements = new Location(getLocation().getRow(), getLocation().getColumn());
         Location locationAfterMovements = currentLocation;
         switch (movementDirection){
             case L:

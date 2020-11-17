@@ -13,7 +13,7 @@ public class Artillery extends Force{
      */
     public Artillery(Location location){
         super(location);
-        setGroupSize(2);
+        setGroupSize(2); // 2 artillery in a set
     }
 
     /**
@@ -106,6 +106,8 @@ public class Artillery extends Force{
                     // now move and tripp in the forest
                     getLocation().setRow(locationAfterMovements.getRow());
                     getLocation().setColumn(locationAfterMovements.getColumn());
+                    // when the force tripped in the forest can not attack
+                    setAttackAbility(false);
                     return true;
                 }
                 getLocation().setRow(locationAfterMovements.getRow());
@@ -113,7 +115,7 @@ public class Artillery extends Force{
             }
         }
         // if everything was ok and also force did not trip in the forest set force's attack ability as true
-        setAttackAbility(true);
+        setAttackAbility(getValidMoves().get(numberOfMovements));
         return true;
     }
 

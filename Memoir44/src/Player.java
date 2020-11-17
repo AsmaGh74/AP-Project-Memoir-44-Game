@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 /**
  * Player class represents a player in the game.
@@ -43,16 +42,13 @@ public abstract class Player {
     }
 
     /*************************************** getter methods ************************************/
-    protected ArrayList<Card> getCards(){return playerCards;}
     protected ArrayList<Force> getForces(){return forces;}
     protected int getNumberOfCards(){return numberOfCards;}
     protected int getScores(){return scores;}
     /*******************************************************************************************/
 
     /*************************************** setter methods ************************************/
-    public void setNumberOfCards(int numberOfCards){ this.numberOfCards = numberOfCards; }
     protected void setPlayerSpecialLocation(Location location){ playerSpecialLocation = location;}
-    protected void setScores(int scores){this.scores = scores;}
     /*******************************************************************************************/
 
 
@@ -63,14 +59,6 @@ public abstract class Player {
     protected boolean cardsListSize(){
         if (playerCards.size() < numberOfCards) return true;
         return false;
-    }
-
-    /**
-     * Add a new card to cards list if there is an empty place.
-     * @param card  card to be added to the list.
-     */
-    protected void addCardToList(Card card){
-        if (cardsListSize()) playerCards.add(card);
     }
 
     /**
@@ -85,15 +73,6 @@ public abstract class Player {
         return false;
     }
 
-    /**
-     * Remove a card from cards list if the card is already in the list.
-     * @param card  card to be removed
-     */
-    protected void removeCardFromList(Card card){
-        for (Card ele:playerCards) {
-            if (checkCardExistenceInTheList(card)) playerCards.remove(ele);
-        }
-    }
 
     /**
      * Remove a card from cards list by it's index.
@@ -137,7 +116,8 @@ public abstract class Player {
     /**
      * Add a score to player's scores.
      */
-    protected void addToScores(){this.scores++;}
+    protected void addToScores(){
+        this.scores++;}
 
     /**
      * Subtract a score from player's scores.
@@ -151,7 +131,6 @@ public abstract class Player {
     protected boolean checkForBeingInSpacialLocation(){
         for (Force ele:forces) {
             if (ele.getLocation().equals(playerSpecialLocation)){
-                this.scores++;
                 return true;
             }
         }

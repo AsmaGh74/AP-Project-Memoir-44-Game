@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     /**
@@ -11,7 +12,7 @@ public class Main {
         return random.nextInt(2) + 1;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws java.lang.InterruptedException{
         Scanner scanner = new Scanner(System.in);
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
         System.out.println(" Welcome to Memoir44");
@@ -21,11 +22,10 @@ public class Main {
         String alliedPlayerName = scanner.nextLine();
         GameMap gameMap = new GameMap(axisPlayerName, alliedPlayerName);
         Text.showScores(0,0);
+        TimeUnit.SECONDS.sleep(1);
         gameMap.drawMap();
-        // start with a random player
-        gameMap.playTheGame(getOneOrTwo());
-//        gameMap.playTheGame(1);
-
+        gameMap.playTheGame(getOneOrTwo());   // start with a random player
+//        gameMap.playTheGame(2);   // start with Allied player
     }
 
 }

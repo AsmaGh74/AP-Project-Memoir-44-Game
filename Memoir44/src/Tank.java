@@ -13,7 +13,6 @@ public class Tank extends Force{
      */
     public Tank(Location location){
         super(location);
-//        setGroupSize();  // Axis and Allied has different group size for their tanks.
     }
 
     /**
@@ -50,7 +49,7 @@ public class Tank extends Force{
         System.out.println(" Force type: Tank");
         for (Integer ele :getValidMoves().keySet()) {
             System.out.print(" " + ele + " move(s)");
-            if (getValidMoves().get(ele) == true) System.out.println(" and then you can attack.");
+            if (getValidMoves().get(ele)) System.out.println(" and then you can attack.");
             else System.out.println(" and then you can't attack.");
         }
     }
@@ -107,6 +106,8 @@ public class Tank extends Force{
                     // now move and tripp in the forest
                     getLocation().setRow(locationAfterMovements.getRow());
                     getLocation().setColumn(locationAfterMovements.getColumn());
+                    // when the force tripped in the forest can not attack
+                    setAttackAbility(false);
                     return true;
                 }
                 getLocation().setRow(locationAfterMovements.getRow());
@@ -114,7 +115,7 @@ public class Tank extends Force{
             }
         }
         // if everything was ok and also force did not trip in the forest set force's attack ability as true
-        setAttackAbility(true);
+        setAttackAbility(getValidMoves().get(numberOfMovements));
         return true;
     }
 
@@ -131,7 +132,6 @@ public class Tank extends Force{
             return 0;
         }
         // tank force can have 3 dice rolling generally
-//        System.out.println(" You can have 3 dice rollings.");  // delete, cause will be manipulate
         return 3;
     }
 }

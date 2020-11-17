@@ -42,20 +42,17 @@ public class Allied extends Player{
         // add tanks
         for (int i = 0; i < numberOfTanks; i++){
             Tank tank = new Tank(locationOfTanks[i]);
-            locationOfTanks[i].setStatus(true);
             tank.setGroupSize(3);
             getForces().add(tank);
         }
         // add infantries
         for (int i = 0; i < numberOfInfantries; i++){
             Infantry infantry = new Infantry(locationOfInfantries[i]);
-            locationOfInfantries[i].setStatus(true);
             getForces().add(infantry);
         }
         // add artillery
         for (int i = 0; i < numberOfArtillery; i++){
             Artillery artillery = new Artillery(locationOfArtillery[i]);
-            locationOfArtillery[i].setStatus(true);
             getForces().add(artillery);
         }
     }

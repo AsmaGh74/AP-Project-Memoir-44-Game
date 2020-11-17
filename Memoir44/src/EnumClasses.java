@@ -5,16 +5,6 @@ enum Color {
     //Color reset
     RESET("\033[0m"),
 
-    // Regular Colors.
-    BLACK("\033[0;30m"),    // BLACK
-    RED("\033[0;31m"),      // RED
-    GREEN("\033[0;32m"),    // GREEN
-    YELLOW("\033[0;33m"),   // YELLOW
-    BLUE("\033[0;34m"),     // BLUE
-    MAGENTA("\033[0;35m"),  // MAGENTA
-    CYAN("\033[0;36m"),     // CYAN
-    WHITE("\033[0;37m"),   // WHITE
-
     // Bold
     BLACK_BOLD("\033[1;30m"),   // BLACK
     RED_BOLD("\033[1;31m"),     // RED
@@ -33,17 +23,7 @@ enum Color {
     BLUE_BACKGROUND("\033[44m"),    // BLUE
     MAGENTA_BACKGROUND("\033[45m"), // MAGENTA
     CYAN_BACKGROUND("\033[46m"),    // CYAN
-    WHITE_BACKGROUND("\033[47m"),   // WHITE
-
-    // High Intensity backgrounds
-    BLACK_BACKGROUND_BRIGHT("\033[0;100m"),     // BLACK
-    RED_BACKGROUND_BRIGHT("\033[0;101m"),       // RED
-    GREEN_BACKGROUND_BRIGHT("\033[0;102m"),     // GREEN
-    YELLOW_BACKGROUND_BRIGHT("\033[0;103m"),    // YELLOW
-    BLUE_BACKGROUND_BRIGHT("\033[0;104m"),      // BLUE
-    MAGENTA_BACKGROUND_BRIGHT("\033[0;105m"),   // MAGENTA
-    CYAN_BACKGROUND_BRIGHT("\033[0;106m"),      // CYAN
-    WHITE_BACKGROUND_BRIGHT("\033[0;107m");     // WHITE
+    WHITE_BACKGROUND("\033[47m");   // WHITE
 
     private final String code;
     Color(String code) {

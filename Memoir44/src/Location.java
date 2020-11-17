@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * Location class defines a single (row, column) tuple from the map.
  * @author Asma
@@ -12,9 +10,7 @@ public class Location {
     // represents the number of column
     // from 1 to 13
     private int column;
-    // indicates that the location if full or empty
-    // true for full and false for empty
-    private boolean status;
+
 
     /**
      * Create a new location on the map game.
@@ -25,18 +21,15 @@ public class Location {
         this.row = row;
         this.column = column;
         // set location initial status to false (empty)
-        this.status = false;
     }
 
     /*************************************** getter methods ************************************/
     public int getRow(){return row;}
     public int getColumn(){return column;}
-    protected boolean getStatus(){ return status;}
     /*******************************************************************************************/
     /*************************************** setter methods ************************************/
     public void setRow(int row){this.row = row;}
     public void setColumn(int column){this.column = column;}
-    protected void setStatus(boolean status){this.status = status;}
     /*******************************************************************************************/
 
     /**
@@ -98,29 +91,5 @@ public class Location {
             if (location.column >= 1 && location.column <= 13) return true;
         }
         return false;
-    }
-
-    /**
-     * This method saves valid directions for a specific location.
-     * Directions that player can go through them.
-     * @return  an array list of valid directions for the location
-     */
-    protected ArrayList<String> validDirectionsInLocation(){
-        ArrayList<String> validDirections = new ArrayList<>();
-        if (validLocation(new Location(row, column+1))) validDirections.add("R");
-        if (validLocation(new Location(row, column-1))) validDirections.add("L");
-        if (row%2 == 0){
-            if (validLocation(new Location(row+1,column))) validDirections.add("DR");
-            if (validLocation(new Location(row+1, column-1))) validDirections.add("DL");
-            if (validLocation(new Location(row-1, column))) validDirections.add("UR");
-            if (validLocation(new Location(row-1, column-1))) validDirections.add("UL");
-        }
-        else {
-            if (validLocation(new Location(row+1,column))) validDirections.add("DL");
-            if (validLocation(new Location(row+1, column+1))) validDirections.add("DR");
-            if (validLocation(new Location(row-1, column))) validDirections.add("UL");
-            if (validLocation(new Location(row-1, column+1))) validDirections.add("UR");
-        }
-        return validDirections;
     }
 }

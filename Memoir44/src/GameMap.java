@@ -1,5 +1,5 @@
-import java.nio.file.LinkOption;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GameMap class implements and presents the map of the game and players.
@@ -130,16 +130,27 @@ public class GameMap {
     /**
      * Print guide for hexagons types.
      */
-    private void guide() {
+    private void guide() throws InterruptedException {
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
         System.out.println();
         System.out.println(" Guide:");
         System.out.println(" G: Ground, H: Hill, C: City, R: River, B: Bridge, S:Shelter, F: Forest");
+        TimeUnit.MILLISECONDS.sleep(300);
         System.out.println(" Axis forces: Red color, Allied forces: Green color");
+        TimeUnit.MILLISECONDS.sleep(300);
         System.out.println(" T: Tank, I: Infantry, A: Artillery");
-        System.out.println(" Axis spatial location: row:9 column:12");
-        System.out.println(" Allied spatial location: row:3 column:1");
+        TimeUnit.MILLISECONDS.sleep(300);
+        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+        System.out.print(" Axis spatial location: row:9 column:12  ");
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
         System.out.println();
+        TimeUnit.MILLISECONDS.sleep(300);
+        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+        System.out.print(" Allied spatial location: row:3 column:1 ");
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        System.out.println();
+        System.out.println();
+        TimeUnit.MILLISECONDS.sleep(300);
     }
 
     /**
@@ -152,13 +163,13 @@ public class GameMap {
         String s = "  ";
         for (Force ele : axisPlayer.getForces()) {
             if (ele.getLocation().equals(location)) {
-                s = Integer.toString(ele.getGroupSize()) + ele.returnForceType();
+                s = (ele.getGroupSize()) + ele.returnForceType();
                 Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
             }
         }
         for (Force ele : alliedPlayer.getForces()) {
             if (ele.getLocation().equals(location)) {
-                s = Integer.toString(ele.getGroupSize()) + ele.returnForceType();
+                s = (ele.getGroupSize()) + ele.returnForceType();
                 Text.setTextAndBackgroundColor(Color.GREEN_BOLD, Color.BLACK_BACKGROUND);
             }
         }
@@ -185,7 +196,7 @@ public class GameMap {
     /**
      * Draw map of the game.
      */
-    public void drawMap() {
+    public void drawMap () throws InterruptedException {
         guide();
         Text.setTextAndBackgroundColor(Color.BLUE_BOLD, Color.BLACK_BACKGROUND);
         // define row and column number variables
@@ -230,6 +241,7 @@ public class GameMap {
             }
             System.out.println();
 
+            TimeUnit.MILLISECONDS.sleep(500);
             // round 2
             for (int i = 0; i < 14; System.out.print("           *"), i++) ;
             System.out.println();
@@ -300,7 +312,7 @@ public class GameMap {
         return axisPlayer;
     }
 
-    protected void playTheGame(int startingPlayerNumber) {
+    protected void playTheGame(int startingPlayerNumber) throws InterruptedException {
         boolean[] beingInSpecialLocationInPreviousRound = {false, false};
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
         System.out.println();
@@ -309,17 +321,21 @@ public class GameMap {
         returnStartingPlayer(playerNumber).printName();
         int k = 0;
         while (!(returnStartingPlayer(playerNumber).getScores() == 6 || returnStartingPlayer(playerNumber + 1).getScores() == 6)) { // change the condition to  k == 0
-            showPlayerCards(returnStartingPlayer(playerNumber)); // after one round increase the startingPlayerNumber
+            showPlayerCards(returnStartingPlayer(playerNumber));
             Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
             // say the player to choose one card
             Scanner scanner = new Scanner(System.in);
-            int cardNumber = 0;
+            // generate valid numbers as string and add to an arraylist
+            ArrayList<String> validCardNumbers = new ArrayList<>();
+            for (int i = 0; i < returnStartingPlayer(playerNumber).getNumberOfCards();
+            validCardNumbers.add(Integer.toString(i + 1)), i++);
+            String cardNumber;
             do {
                 System.out.println(" Now pick a card and enter it's number (please enter a valid number):");
-                cardNumber = Integer.valueOf(scanner.nextLine());
-            } while (!(cardNumber > 0 && cardNumber <= returnStartingPlayer(playerNumber).getNumberOfCards()));
-            int numberOfUnits = returnStartingPlayer(playerNumber).returnCardNumberOfUnits(cardNumber - 1);
-            boolean differentUnits = returnStartingPlayer(playerNumber).returnCardDifferentForceType(cardNumber - 1);
+                cardNumber = scanner.nextLine();
+            } while (!(validCardNumbers.contains(cardNumber)));
+            int numberOfUnits = returnStartingPlayer(playerNumber).returnCardNumberOfUnits(Integer.valueOf(cardNumber) - 1);
+            boolean differentUnits = returnStartingPlayer(playerNumber).returnCardDifferentForceType(Integer.valueOf(cardNumber) - 1);
             System.out.print(" Now you can select " + numberOfUnits + " ");
             Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
             if (differentUnits) System.out.print(" different or identical");
@@ -328,7 +344,7 @@ public class GameMap {
             System.out.println(" unit(s)\n Enter number of row (1-9) and column (1-13) with a space for every unit based on the map.\n" +
                     " Example:1 2");
             // now remove selected card from player's cards
-            returnStartingPlayer(playerNumber).removeCardFromListByIndex(cardNumber - 1);
+            returnStartingPlayer(playerNumber).removeCardFromListByIndex(Integer.valueOf(cardNumber) - 1);
             // let the player to select forces
             ArrayList<Integer> numberOfSelectedForces = new ArrayList<>();
             int rowNumber = 0;
@@ -338,7 +354,10 @@ public class GameMap {
                 for (int i = 0; i < numberOfUnits; i++) {
                     String[] location;
                     do {
-                        System.out.println(" Enter row and column number for force number " + (i + 1) + " :");
+                        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                        System.out.print(" Enter row and column number for force number " + (i + 1) + " :");
+                        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                        System.out.println();
                         location = scanner.nextLine().split(" ");
                     } while (!checkForValidRowAndColumnNumber(location));
                     rowNumber = Integer.valueOf(location[0]);
@@ -346,13 +365,13 @@ public class GameMap {
                     numberOfSelectedForces.add(returnStartingPlayer(playerNumber).returnPlayerForceIndexBasedOnLocation(rowNumber, columnNumber));
                 }
             } while (!returnStartingPlayer(playerNumber).checkForNumbersOfSelectedForces(differentUnits, numberOfSelectedForces));
-            // erase the console and show the scores and draw the map
-            if (playerNumber % 2 == 0) Text.showScores(returnStartingPlayer(playerNumber + 1).getScores(),
-                    returnStartingPlayer(playerNumber).getScores());
-            else Text.showScores(returnStartingPlayer(playerNumber).getScores(),
-                    returnStartingPlayer(playerNumber + 1).getScores());
+            // draw the map
             drawMap();
-            System.out.println(" Forces selected successfully.\n Now moving part starts.");
+            System.out.println(" Forces selected successfully.");
+            Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+            System.out.print(" Now moving part starts.");
+            Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+            System.out.println();
             // ask player for selected forces movements
             ArrayList<String> movements = new ArrayList<>();
             Text.listMovementDirections();
@@ -360,8 +379,11 @@ public class GameMap {
                 String[] moves;
                 do {
                     movements.removeAll(movements);
+                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
                     System.out.print(" Select your move for force ");
                     returnStartingPlayer(playerNumber).getForces().get(ele - 1).getLocation().printInfo();
+                    System.out.print(" ");
+                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                     System.out.println();
                     System.out.println(" Valid movements:");
                     // print valid movements for the force
@@ -373,18 +395,33 @@ public class GameMap {
                         if (string != null) movements.add(string);
                     }
                 } while (!returnStartingPlayer(playerNumber).getForces().get(ele - 1).checkMovementsValidityForForce(movements));
-                if (moves[0].equals("0")) continue;
+                if (moves[0].equals("0")) {
+                    returnStartingPlayer(playerNumber).getForces().get(ele - 1).setAttackAbility(true);
+                    continue;
+                }
             }
             // now we should check for spacial locations for player's forces and change the scores based on the result
             if (returnStartingPlayer(playerNumber).checkForBeingInSpacialLocation()) {
                 if (!beingInSpecialLocationInPreviousRound[playerNumber % 2]) {
                     returnStartingPlayer(playerNumber).addToScores();
-                    System.out.println(" You are in the special location. New Score ***");
+                    beingInSpecialLocationInPreviousRound[playerNumber % 2] = true;
+                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                    System.out.print(" You are in the special location. New Score ***");
+                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                    System.out.println();
+                    System.out.println();
+                    TimeUnit.SECONDS.sleep(1);
                 }
             } else {
                 if (beingInSpecialLocationInPreviousRound[playerNumber % 2]) {
                     returnStartingPlayer(playerNumber).subtractFromScores();
-                    System.out.println(" You lost the special location!");
+                    beingInSpecialLocationInPreviousRound[playerNumber % 2] = false;
+                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                    System.out.print(" You lost the special location! SO you lost a score!");
+                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                    System.out.println();
+                    System.out.println();
+                    TimeUnit.SECONDS.sleep(1);
                 }
             }
             // now that we have valid movements for all the forces, we should redraw the game map
@@ -393,8 +430,12 @@ public class GameMap {
                     returnStartingPlayer(playerNumber).getScores());
             else Text.showScores(returnStartingPlayer(playerNumber).getScores(),
                     returnStartingPlayer(playerNumber + 1).getScores());
+            TimeUnit.SECONDS.sleep(1);
             drawMap();
-            System.out.println(" The forces moved successfully.\n Now attacking part starts.");
+            System.out.println(" The forces moved successfully.");
+            Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+            System.out.print(" Now attacking part starts.");
+            Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
             System.out.println();
             // now we should start attack part
             for (Integer ele : numberOfSelectedForces) {
@@ -406,8 +447,11 @@ public class GameMap {
                     String[] location;
                     do {
                         do {
+                            Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
                             System.out.print(" Select target for force ");
                             returnStartingPlayer(playerNumber).getForces().get(ele - 1).getLocation().printInfo();
+                            System.out.print(" ");
+                            Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                             System.out.println();
                             System.out.println(" Enter number of row (1-9) and column (1-13) with a space based on the map " +
                                     "or just enter 0 to not attack.\n" + " Example:1 2");
@@ -443,53 +487,97 @@ public class GameMap {
                     // now we have the random selected dice numbers
                     // now based on target force type and dice numbers we should determine attack ability
                     if (diceNumbers.contains(3) || diceNumbers.contains(4)) {
-                        System.out.println(" You can not attack with this force! (dice error)");
+                        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                        System.out.print(" You can not attack with this force! (dice error)");
+                        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                        System.out.println();
+                        System.out.println();
+                        TimeUnit.SECONDS.sleep(1);
                         continue;
                     }
                     if (diceNumbers.contains(5)) {
                         targetForce.setGroupSize(targetForce.getGroupSize() - 1);
-                        System.out.println(" Attack completed!");
+                        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                        System.out.print(" Attack completed!");
+                        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                        System.out.println();
+                        System.out.println();
+                        TimeUnit.SECONDS.sleep(1);
                         if (targetForce.getGroupSize() == 0) {
                             returnStartingPlayer(playerNumber).addToScores();
                             // remove the force with 0 group size
-                            returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
-                            System.out.println(" You get a new score ***");
+                            returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList-1);
+                            Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                            System.out.print(" You get a new score ***");
+                            Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                            System.out.println();
+                            System.out.println();
+                            TimeUnit.SECONDS.sleep(1);
                         }
                     } else {
                         switch (targetForce.returnForceType()) {
                             case "I":
                                 if (diceNumbers.contains(1) || diceNumbers.contains(6)) { // attacker force can attack
                                     targetForce.setGroupSize(targetForce.getGroupSize() - 1);
-                                    System.out.println(" Attack completed!");
+                                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                    System.out.print(" Attack completed!");
+                                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                                    System.out.println();
+                                    System.out.println();
+                                    TimeUnit.SECONDS.sleep(1);
                                     if (targetForce.getGroupSize() == 0) {
                                         returnStartingPlayer(playerNumber).addToScores();
                                         // remove the force with 0 group size
-                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
-                                        System.out.println(" You get a new score ***");
+                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList-1);
+                                        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                        System.out.print(" You get a new score ***");
+                                        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                                        System.out.println();
+                                        System.out.println();
+                                        TimeUnit.SECONDS.sleep(1);
                                     }
                                 }
                                 break;
                             case "T":
                                 if (diceNumbers.contains(2)) { // attacker force can attack
                                     targetForce.setGroupSize(targetForce.getGroupSize() - 1);
-                                    System.out.println(" Attack completed!");
+                                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                    System.out.print(" Attack completed!");
+                                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                                    System.out.println();
+                                    System.out.println();
+                                    TimeUnit.SECONDS.sleep(1);
                                     if (targetForce.getGroupSize() == 0) {
                                         returnStartingPlayer(playerNumber).addToScores();
                                         // remove the force with 0 group size
-                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList);
-                                        System.out.println(" You get a new score ***");
+                                        returnStartingPlayer(playerNumber + 1).getForces().remove(numberOfTargetForceInTheList-1);
+                                        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                        System.out.print(" You get a new score ***");
+                                        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+                                        System.out.println();
+                                        System.out.println();
+                                        TimeUnit.SECONDS.sleep(1);
                                     }
                                 }
                                 break;
+                            default:
+                                Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                System.out.print(" Force can not attack based on the rules!");
+                                Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                                System.out.println();
                         }
                     }
                     attackerForce.setAttackAbility(false);
                 }
                 else {
+                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
                     System.out.print(" Force ");
                     returnStartingPlayer(playerNumber).getForces().get(ele - 1).getLocation().printInfo();
-                    System.out.println(" can't attack this round!");
+                    System.out.print(" can't attack this round!");
+                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                     System.out.println();
+                    System.out.println();
+                    TimeUnit.SECONDS.sleep(1);
                 }
             }
             // show the scores and draw the map
@@ -497,10 +585,10 @@ public class GameMap {
                     returnStartingPlayer(playerNumber).getScores());
             else Text.showScores(returnStartingPlayer(playerNumber).getScores(),
                     returnStartingPlayer(playerNumber + 1).getScores());
+            TimeUnit.SECONDS.sleep(1);
             drawMap();
             // now change the player
             playerNumber++;
-            k++;
         }
     }
 

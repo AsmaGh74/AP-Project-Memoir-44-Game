@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * Axis class represents Axis player.
  * @author Asma
@@ -43,13 +41,11 @@ public class Axis extends Player{
         for (int i = 0; i < numberOfTanks; i++){
             Tank tank = new Tank(locationOfTanks[i]);
             tank.setGroupSize(4);
-            locationOfTanks[i].setStatus(true);
             getForces().add(tank);
         }
         // add infantries
         for (int i = 0; i < numberOfInfantries; i++){
             Infantry infantry = new Infantry(locationOfInfantries[i]);
-            locationOfInfantries[i].setStatus(true);
             getForces().add(infantry);
         }
     }

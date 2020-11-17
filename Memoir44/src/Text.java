@@ -96,7 +96,7 @@ public class Text {
         System.out.println("   **                 SCORES                    **");
         System.out.println("   **                                           **");
         System.out.println("   **                AXIS:  "  + axisScores + "                   **");
-        System.out.println("   **               ALLIED:  "  + axisScores + "                  **");
+        System.out.println("   **               ALLIED:  "  + alliedScores + "                  **");
         System.out.println("   **                                           **");
         System.out.println("   ***********************************************");
         System.out.println(Color.RESET);
@@ -105,7 +105,7 @@ public class Text {
     public static void printDiceNumbersHorizontally(ArrayList<Integer> diceNumbers){
         if (diceNumbers.size() != 0){
             System.out.println();
-            System.out.println(" Dice rolling result:");
+            System.out.print(" Dice rolling result:");
             for (Integer ele:diceNumbers) {
                 System.out.print(" " + ele + " ");
             }
