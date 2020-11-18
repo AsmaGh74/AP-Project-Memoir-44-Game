@@ -91,7 +91,7 @@ public class Artillery extends Force{
                 }
                 if (GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("R") ||
                         GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("S")){
-                    System.out.println(" There is a river or shelter through the path! Artillery can not move through them!");
+                    System.out.println(" A river or shelter crosses the path! Artillery can not pass it!");
                     return false;
                 }
             }

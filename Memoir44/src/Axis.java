@@ -19,6 +19,7 @@ public class Axis extends Player{
 
     /**
      * We can only have one instance from this class.
+     * @param name axis player's name
      * @return  instance
      */
     public static Axis getInstance(String name){

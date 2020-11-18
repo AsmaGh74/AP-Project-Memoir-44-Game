@@ -19,6 +19,7 @@ public class Text {
 
     /**
      * For every entered string fill it sides by space.
+     * @param size return a string with this size
      * @param text entered string
      * @return a string with specific length
      */
@@ -91,7 +92,8 @@ public class Text {
      * @param alliedScores  allied player scores
      */
     public static void showScores(int axisScores, int alliedScores){
-        setTextAndBackgroundColor(Color.YELLOW_BOLD, Color.WHITE_BACKGROUND);
+//        setTextAndBackgroundColor(Color.YELLOW_BOLD, Color.WHITE_BACKGROUND);
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.BLUE_BACKGROUND);
         System.out.println("   ***********************************************");
         System.out.println("   **                 SCORES                    **");
         System.out.println("   **                                           **");
@@ -111,6 +113,20 @@ public class Text {
             }
             System.out.println();
         }
+    }
+
+    /**
+     * This method will announce and print the winner player.
+     * @param player  winner player
+     */
+    public static void showTheWinner(Player player){
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.BLUE_BACKGROUND);
+        System.out.println("********************************************************************");
+        System.out.print("                      WINNER:  **");
+        if (player.returnPlayerType().equals("Ax")) System.out.println("Axis**                   ");
+        else System.out.println("Allied**                   ");
+        System.out.println("********************************************************************");
+        System.out.println(Color.RESET);
     }
 
 }

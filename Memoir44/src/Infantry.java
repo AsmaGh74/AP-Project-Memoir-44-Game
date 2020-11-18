@@ -92,7 +92,7 @@ public class Infantry extends Force{
                     return false;
                 }
                 if (GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("R")){
-                    System.out.println(" There is a river through the path! No force can move through it!");
+                    System.out.println(" A river crosses the path! No force can pass it!");
                     return false;
                 }
             }
@@ -103,7 +103,7 @@ public class Infantry extends Force{
             for (int i = 0; i < Integer.parseInt(String.valueOf(ele.charAt(0))); i++) {
                 locationAfterMovements = move(Text.convertStringToMovementDirection(ele.substring(1)), locationAfterMovements);
                 if (GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("F")){
-                    System.out.println(" Now your force is tripped in forest and can't have any kind of action in this round!");
+                    System.out.println(" Now your force is stuck in the forest and can't have any kind of action in this round!");
                     // now move and tripp in the forest
                     getLocation().setRow(locationAfterMovements.getRow());
                     getLocation().setColumn(locationAfterMovements.getColumn());

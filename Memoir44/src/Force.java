@@ -45,6 +45,8 @@ public abstract class Force {
 
     /**
      * This method implements movement for force.
+     * @param movementDirection direction of the movement
+     * @param currentLocation current location of the force
      * @return new location after movements
      */
     public Location move(MovementDirections movementDirection, Location currentLocation){

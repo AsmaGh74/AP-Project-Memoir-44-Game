@@ -28,6 +28,7 @@ public abstract class Player {
     /**
      * Creates a new player with specific number of cards in which the player can have in every round.
      * @param numberOfCards number of cards in which the player can have in every round
+     * @param name player's name
      */
     public Player(String name, int numberOfCards){
         this.name = name;

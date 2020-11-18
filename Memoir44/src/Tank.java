@@ -77,7 +77,6 @@ public class Tank extends Force{
         }
         // check for validity of number of movements
         if (!getValidMoves().keySet().contains(numberOfMovements)){
-            System.out.println(numberOfMovements); // test
             System.out.println(" Invalid number of movements for the Tank!");
             return false;
         }
@@ -91,7 +90,7 @@ public class Tank extends Force{
                 }
                 if (GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("R") ||
                         GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("S")){
-                    System.out.println(" There is a river or shelter through the path! Tank can not move through them!");
+                    System.out.println(" A river or shelter crosses the path! Tank can not path it!");
                     return false;
                 }
             }
@@ -102,7 +101,7 @@ public class Tank extends Force{
             for (int i = 0; i < Integer.parseInt(String.valueOf(ele.charAt(0))); i++) {
                 locationAfterMovements = move(Text.convertStringToMovementDirection(ele.substring(1)), locationAfterMovements);
                 if (GameMap.hexagonTypeInTheLocation(locationAfterMovements).equals("F")){
-                    System.out.println(" Now your force is tripped in forest and can't have any kind of action in this round!");
+                    System.out.println(" Now your force is stuck in the forest and can't have any kind of action in this round!");
                     // now move and tripp in the forest
                     getLocation().setRow(locationAfterMovements.getRow());
                     getLocation().setColumn(locationAfterMovements.getColumn());

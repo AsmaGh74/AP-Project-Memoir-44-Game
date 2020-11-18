@@ -19,6 +19,7 @@ public class Allied extends Player{
 
     /**
      * We can only have one instance from this class.
+     * @param name allied player's name
      * @return  instance
      */
     public static Allied getInstance(String name){

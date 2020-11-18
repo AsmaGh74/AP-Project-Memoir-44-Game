@@ -15,9 +15,13 @@ public class GameMap {
     private static Allied alliedPlayer;
     // stores dice roller for attack part of the game
     private DiceRoller diceRoller;
+    // max score for winning
+    private int maxScore;
 
     /**
      * Create a new map for the game.
+     * @param axisPlayerName  axis player's name
+     * @param alliedPlayerName allied player's name
      */
     public GameMap(String axisPlayerName, String alliedPlayerName) {
         hexagons = new HashMap<Location, HexagonalType>();
@@ -28,6 +32,7 @@ public class GameMap {
         // initialize the only Allied player
         alliedPlayer = Allied.getInstance(alliedPlayerName);
         diceRoller = new DiceRoller();
+        maxScore = 6;
     }
 
     /********************************************************** getter methods *****************************************/
@@ -136,7 +141,10 @@ public class GameMap {
         System.out.println(" Guide:");
         System.out.println(" G: Ground, H: Hill, C: City, R: River, B: Bridge, S:Shelter, F: Forest");
         TimeUnit.MILLISECONDS.sleep(300);
-        System.out.println(" Axis forces: Red color, Allied forces: Green color");
+        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+        System.out.print(" Axis forces: Red, Allied forces: Green  ");
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+        System.out.println();
         TimeUnit.MILLISECONDS.sleep(300);
         System.out.println(" T: Tank, I: Infantry, A: Artillery");
         TimeUnit.MILLISECONDS.sleep(300);
@@ -277,7 +285,9 @@ public class GameMap {
                 System.out.println();
             }
         }
-        System.out.print(Color.RESET);
+        System.out.println();
+        System.out.println("    rows: from 1 to 9");
+        System.out.println("    columns: from 1 to 13");
         System.out.println();
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
     }
@@ -314,13 +324,13 @@ public class GameMap {
 
     protected void playTheGame(int startingPlayerNumber) throws InterruptedException {
         boolean[] beingInSpecialLocationInPreviousRound = {false, false};
+        boolean end = false;
         Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
         System.out.println();
         System.out.print(" The game will start with: ");
         int playerNumber = startingPlayerNumber;
         returnStartingPlayer(playerNumber).printName();
-        int k = 0;
-        while (!(returnStartingPlayer(playerNumber).getScores() == 6 || returnStartingPlayer(playerNumber + 1).getScores() == 6)) { // change the condition to  k == 0
+        while (!(returnStartingPlayer(playerNumber).getScores() == maxScore || returnStartingPlayer(playerNumber + 1).getScores() == maxScore)) { // change the condition to  k == 0
             showPlayerCards(returnStartingPlayer(playerNumber));
             Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
             // say the player to choose one card
@@ -333,7 +343,9 @@ public class GameMap {
             do {
                 System.out.println(" Now pick a card and enter it's number (please enter a valid number):");
                 cardNumber = scanner.nextLine();
+                if (cardNumber.equals("exit")) break;  // exit game
             } while (!(validCardNumbers.contains(cardNumber)));
+            if (cardNumber.equals("exit")) break;
             int numberOfUnits = returnStartingPlayer(playerNumber).returnCardNumberOfUnits(Integer.valueOf(cardNumber) - 1);
             boolean differentUnits = returnStartingPlayer(playerNumber).returnCardDifferentForceType(Integer.valueOf(cardNumber) - 1);
             System.out.print(" Now you can select " + numberOfUnits + " ");
@@ -341,30 +353,34 @@ public class GameMap {
             if (differentUnits) System.out.print(" different or identical");
             else System.out.print(" identical");
             Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
-            System.out.println(" unit(s)\n Enter number of row (1-9) and column (1-13) with a space for every unit based on the map.\n" +
+            System.out.println(" unit(s)\n Enter number of row and column with a space for every unit, based on the map.\n" +
                     " Example:1 2");
             // now remove selected card from player's cards
             returnStartingPlayer(playerNumber).removeCardFromListByIndex(Integer.valueOf(cardNumber) - 1);
             // let the player to select forces
             ArrayList<Integer> numberOfSelectedForces = new ArrayList<>();
+            String[] location = null;
             int rowNumber = 0;
             int columnNumber = 0;
             do {
                 numberOfSelectedForces.removeAll(numberOfSelectedForces);
                 for (int i = 0; i < numberOfUnits; i++) {
-                    String[] location;
                     do {
                         Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
                         System.out.print(" Enter row and column number for force number " + (i + 1) + " :");
                         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                         System.out.println();
                         location = scanner.nextLine().split(" ");
+                        if (location[0].equals("exit")) break;
                     } while (!checkForValidRowAndColumnNumber(location));
+                    if (location[0].equals("exit")) break;
                     rowNumber = Integer.valueOf(location[0]);
                     columnNumber = Integer.valueOf(location[1]);
                     numberOfSelectedForces.add(returnStartingPlayer(playerNumber).returnPlayerForceIndexBasedOnLocation(rowNumber, columnNumber));
                 }
+                if (location[0].equals("exit")) break;
             } while (!returnStartingPlayer(playerNumber).checkForNumbersOfSelectedForces(differentUnits, numberOfSelectedForces));
+            if (location[0].equals("exit")) break;
             // draw the map
             drawMap();
             System.out.println(" Forces selected successfully.");
@@ -375,8 +391,8 @@ public class GameMap {
             // ask player for selected forces movements
             ArrayList<String> movements = new ArrayList<>();
             Text.listMovementDirections();
+            String[] moves = null;
             for (Integer ele : numberOfSelectedForces) {
-                String[] moves;
                 do {
                     movements.removeAll(movements);
                     Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
@@ -388,18 +404,24 @@ public class GameMap {
                     System.out.println(" Valid movements:");
                     // print valid movements for the force
                     returnStartingPlayer(playerNumber).getForces().get(ele - 1).printValidMovements();
-                    System.out.println(" Enter your movement (example: 1R 2UL or just 0 to not move):");
+                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                    System.out.print(" Enter your movement (example: 1R 2UL or just 0 to not move):");
+                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                    System.out.println();
                     moves = scanner.nextLine().split(" "); // add to array list
                     if (moves[0].equals("0")) break;
+                    if (moves[0].equals("exit")) break;
                     for (String string : moves) {
                         if (string != null) movements.add(string);
                     }
                 } while (!returnStartingPlayer(playerNumber).getForces().get(ele - 1).checkMovementsValidityForForce(movements));
+                if (moves[0].equals("exit")) break;
                 if (moves[0].equals("0")) {
                     returnStartingPlayer(playerNumber).getForces().get(ele - 1).setAttackAbility(true);
                     continue;
                 }
             }
+            if (moves[0].equals("exit")) break;
             // now we should check for spacial locations for player's forces and change the scores based on the result
             if (returnStartingPlayer(playerNumber).checkForBeingInSpacialLocation()) {
                 if (!beingInSpecialLocationInPreviousRound[playerNumber % 2]) {
@@ -410,7 +432,7 @@ public class GameMap {
                     Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                     System.out.println();
                     System.out.println();
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                 }
             } else {
                 if (beingInSpecialLocationInPreviousRound[playerNumber % 2]) {
@@ -421,9 +443,25 @@ public class GameMap {
                     Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                     System.out.println();
                     System.out.println();
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                 }
             }
+            // check for the scores after moving part
+            if (axisPlayer.getScores() == maxScore) {
+                System.out.println();
+                System.out.println(" End of the game.");
+                Text.showTheWinner(axisPlayer);
+                end = true;
+                break;
+            }
+            if (alliedPlayer.getScores() == maxScore) {
+                System.out.println();
+                System.out.println(" End of the game.");
+                Text.showTheWinner(alliedPlayer);
+                end = true;
+                break;
+            }
+
             // now that we have valid movements for all the forces, we should redraw the game map
             // show the scores and draw the map
             if (playerNumber % 2 == 0) Text.showScores(returnStartingPlayer(playerNumber + 1).getScores(),
@@ -444,21 +482,21 @@ public class GameMap {
                 if (attackerForce.getAttackAbility()) {
                     int numberOfTargetForceInTheList = 0;
                     int initialNumberOfDiceRolling = 0;
-                    String[] location;
                     do {
                         do {
                             Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
-                            System.out.print(" Select target for force ");
+                            System.out.print(" Enter target location for force ");
                             returnStartingPlayer(playerNumber).getForces().get(ele - 1).getLocation().printInfo();
                             System.out.print(" ");
                             Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                             System.out.println();
-                            System.out.println(" Enter number of row (1-9) and column (1-13) with a space based on the map " +
-                                    "or just enter 0 to not attack.\n" + " Example:1 2");
+                            System.out.println(" (example:1 3 or just 0 to not attack)");
                             location = scanner.nextLine().split(" ");
                             if (location[0].equals("0")) break; // break the do-while loop
+                            if (location[0].equals("exit")) break;
                         }while (!checkForValidRowAndColumnNumber(location));
                         if (location[0].equals("0")) break; // break the do-while loop
+                        if (location[0].equals("exit")) break;
                         rowNumber = Integer.valueOf(location[0]);
                         columnNumber = Integer.valueOf(location[1]);
                         numberOfTargetForceInTheList = returnStartingPlayer(playerNumber + 1).returnPlayerForceIndexBasedOnLocation(rowNumber, columnNumber);
@@ -469,11 +507,11 @@ public class GameMap {
                     } while (initialNumberOfDiceRolling == 0); // check for target location validity
                     // now player has selected the target location
                     if (location[0].equals("0")) continue; // go to next selected force to attack
+                    if (location[0].equals("exit")) break;
                     Force targetForce = returnStartingPlayer(playerNumber + 1).getForces().get(numberOfTargetForceInTheList - 1);
                     // if the attacker type is allied and axis force is in the shelter, allied tank should roll the dice twice less
                     // and allied infantry should roll the dice once less
                     if (returnStartingPlayer(playerNumber).returnPlayerType().equals("Al")) {
-//                        System.out.println(" check for allied al"); // test
                         if (attackerForce.returnForceType().equals("T")) initialNumberOfDiceRolling -= 2;
                         if (attackerForce.returnForceType().equals("I")) initialNumberOfDiceRolling--;
                     }
@@ -492,7 +530,7 @@ public class GameMap {
                         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                         System.out.println();
                         System.out.println();
-                        TimeUnit.SECONDS.sleep(1);
+                        TimeUnit.SECONDS.sleep(2);
                         continue;
                     }
                     if (diceNumbers.contains(5)) {
@@ -502,7 +540,7 @@ public class GameMap {
                         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                         System.out.println();
                         System.out.println();
-                        TimeUnit.SECONDS.sleep(1);
+                        TimeUnit.SECONDS.sleep(2);
                         if (targetForce.getGroupSize() == 0) {
                             returnStartingPlayer(playerNumber).addToScores();
                             // remove the force with 0 group size
@@ -512,7 +550,7 @@ public class GameMap {
                             Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                             System.out.println();
                             System.out.println();
-                            TimeUnit.SECONDS.sleep(1);
+                            TimeUnit.SECONDS.sleep(2);
                         }
                     } else {
                         switch (targetForce.returnForceType()) {
@@ -524,7 +562,7 @@ public class GameMap {
                                     Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                                     System.out.println();
                                     System.out.println();
-                                    TimeUnit.SECONDS.sleep(1);
+                                    TimeUnit.SECONDS.sleep(2);
                                     if (targetForce.getGroupSize() == 0) {
                                         returnStartingPlayer(playerNumber).addToScores();
                                         // remove the force with 0 group size
@@ -534,8 +572,14 @@ public class GameMap {
                                         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                                         System.out.println();
                                         System.out.println();
-                                        TimeUnit.SECONDS.sleep(1);
+                                        TimeUnit.SECONDS.sleep(2);
                                     }
+                                } else {
+                                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                    System.out.print(" Force can not attack based on the rules!");
+                                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                                    System.out.println();
+                                    TimeUnit.SECONDS.sleep(2);
                                 }
                                 break;
                             case "T":
@@ -546,7 +590,7 @@ public class GameMap {
                                     Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                                     System.out.println();
                                     System.out.println();
-                                    TimeUnit.SECONDS.sleep(1);
+                                    TimeUnit.SECONDS.sleep(2);
                                     if (targetForce.getGroupSize() == 0) {
                                         returnStartingPlayer(playerNumber).addToScores();
                                         // remove the force with 0 group size
@@ -556,8 +600,14 @@ public class GameMap {
                                         Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
                                         System.out.println();
                                         System.out.println();
-                                        TimeUnit.SECONDS.sleep(1);
+                                        TimeUnit.SECONDS.sleep(2);
                                     }
+                                } else {
+                                    Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+                                    System.out.print(" Force can not attack based on the rules!");
+                                    Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
+                                    System.out.println();
+                                    TimeUnit.SECONDS.sleep(2);
                                 }
                                 break;
                             default:
@@ -565,6 +615,7 @@ public class GameMap {
                                 System.out.print(" Force can not attack based on the rules!");
                                 Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                                 System.out.println();
+                                TimeUnit.SECONDS.sleep(2);
                         }
                     }
                     attackerForce.setAttackAbility(false);
@@ -577,9 +628,10 @@ public class GameMap {
                     Text.setTextAndBackgroundColor(Color.BLACK_BOLD, Color.WHITE_BACKGROUND);
                     System.out.println();
                     System.out.println();
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.SECONDS.sleep(2);
                 }
             }
+            if (location[0].equals("exit")) break;
             // show the scores and draw the map
             if (playerNumber % 2 == 0) Text.showScores(returnStartingPlayer(playerNumber + 1).getScores(),
                     returnStartingPlayer(playerNumber).getScores());
@@ -589,6 +641,14 @@ public class GameMap {
             drawMap();
             // now change the player
             playerNumber++;
+        }
+        // now show the winner
+        if (!end){
+            System.out.println();
+            System.out.println(" End of the game.");
+            System.out.println();
+            if (axisPlayer.getScores() == maxScore) Text.showTheWinner(axisPlayer);
+            if (alliedPlayer.getScores() == maxScore) Text.showTheWinner(alliedPlayer);
         }
     }
 
@@ -601,6 +661,10 @@ public class GameMap {
     private boolean checkForValidRowAndColumnNumber(String[] rowAndColumn) {
         final Set<String> validRows = new HashSet<String>(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"));
         final Set<String> validColumns = new HashSet<String>(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"));
+        if (rowAndColumn.length < 2){
+            System.out.println(" Invalid number for row or/and column!");
+            return false;
+        }
         if (validRows.contains(rowAndColumn[0])) {
             if (validColumns.contains(rowAndColumn[1])) return true;
         }

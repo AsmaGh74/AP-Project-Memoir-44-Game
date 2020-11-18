@@ -14,13 +14,21 @@ public class Main {
 
     public static void main(String[] args) throws java.lang.InterruptedException{
         Scanner scanner = new Scanner(System.in);
-        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.BLUE_BACKGROUND);
         System.out.println(" Welcome to Memoir44");
+        TimeUnit.SECONDS.sleep(1);
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
         System.out.println(" Axis player: please enter your name: ");
         String axisPlayerName = scanner.nextLine();
         System.out.println(" Allied player: please enter your name: ");
         String alliedPlayerName = scanner.nextLine();
         GameMap gameMap = new GameMap(axisPlayerName, alliedPlayerName);
+        Text.setTextAndBackgroundColor(Color.RED_BOLD, Color.BLACK_BACKGROUND);
+        System.out.println();
+        System.out.println(" You can enter exit at any stage to exit the game (just write exit).");
+        System.out.println();
+        Text.setTextAndBackgroundColor(Color.BLACK_BOLD,Color.WHITE_BACKGROUND);
+        TimeUnit.SECONDS.sleep(3);
         Text.showScores(0,0);
         TimeUnit.SECONDS.sleep(1);
         gameMap.drawMap();
